@@ -1,0 +1,23 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ include "profile-service.fullname" . }}
+spec:
+  {{- with .Values.virtualService.gateways }}
+  gateways:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  hosts:
+    - "*"
+  http:
+    - match:
+    {{- with .Values.virtualService.uri }}
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+      rewrite:
+        uri: /
+      route:
+        - destination:
+            host: {{ include "profile-service.fullname" . }}
+            port:
+              number: {{ .Values.service.port }}
